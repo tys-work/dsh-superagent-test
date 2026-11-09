@@ -14,6 +14,14 @@ shot() {
   echo "screenshot: $OUT/$1.png"
 }
 
+scroll_down() {
+  local i
+  for i in 1 2 3; do
+    "$ADB" shell input swipe $((SCREEN_W / 2)) $((SCREEN_H * 3 / 4)) $((SCREEN_W / 2)) $((SCREEN_H / 4)) 350 >/dev/null 2>&1 || true
+    sleep 1
+  done
+}
+
 tap_xy() {
   echo "tap $1 $2"
   "$ADB" shell input tap "$1" "$2" >/dev/null 2>&1 || true
@@ -80,7 +88,7 @@ panel_frame() {
   "$ADB" shell dumpsys window windows 2>/dev/null | python3 -c '
 import re, sys
 text = sys.stdin.read()
-best = None
+candidates = []
 for block in text.split("Window #"):
     if "com.suimo.assistant" not in block:
         continue
@@ -88,10 +96,11 @@ for block in text.split("Window #"):
     if not frame:
         continue
     x1, y1, x2, y2 = map(int, frame.groups())
-    if x2 - x1 > 200 and y2 - y1 > 120:
-        best = (x1, y1, x2, y2)
-if best:
-    print(*best)
+    width, height = x2 - x1, y2 - y1
+    if 200 < width < 1500 and 120 < height < 1500:
+        candidates.append((width * height, (x1, y1, x2, y2)))
+if candidates:
+    print(*min(candidates)[1])
 else:
     sys.exit(1)
 ' 2>/dev/null
@@ -147,25 +156,30 @@ screen_metrics
 "$ADB" shell appops set "$PKG" SYSTEM_ALERT_WINDOW allow || true
 "$ADB" shell pm grant "$PKG" android.permission.POST_NOTIFICATIONS || true
 
-# 1. Settings, light theme.
+# 1. Settings, light theme (top and AI card).
 "$ADB" shell am start -W -n "$PKG/.MainActivity" >/dev/null 2>&1 || true
 sleep 3
 shot 01-android-settings-light
+scroll_down
+shot 02-android-settings-ai-light
 
 # 2. Settings, dark theme.
 "$ADB" shell cmd uimode night yes || true
 "$ADB" shell am force-stop "$PKG" || true
 "$ADB" shell am start -W -n "$PKG/.MainActivity" >/dev/null 2>&1 || true
 sleep 3
-shot 02-android-settings-dark
+shot 03-android-settings-dark
+scroll_down
+shot 04-android-settings-ai-dark
 "$ADB" shell cmd uimode night no || true
 
 # 3. Grant capture and show the floating panel.
 "$ADB" shell am force-stop "$PKG" || true
 "$ADB" shell am start -W -n "$PKG/.MainActivity" >/dev/null 2>&1 || true
 sleep 2
+scroll_down
 start_overlay
-shot 03-android-overlay-panel
+shot 05-android-overlay-panel
 
 # 4. Collapse to the ink dot above the launcher, then read a screen in demo mode.
 "$ADB" shell input keyevent KEYCODE_HOME || true
@@ -174,12 +188,12 @@ collapse_panel
 sleep 1
 bubble_tap
 sleep 2
-shot 04-android-overlay-suggestions
+shot 06-android-overlay-suggestions
 
 # 5. Crop selector over the current screen.
 open_crop_panel
 sleep 2
-shot 05-android-crop
+shot 07-android-crop
 tap_text "取消" || tap_xy $((SCREEN_W - $(dp 188))) $((SCREEN_H - $(dp 41))) || true
 
 echo "done"
