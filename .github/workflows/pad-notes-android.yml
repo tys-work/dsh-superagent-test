@@ -119,5 +119,6 @@ jobs:
             echo "No screenshot changes to commit."
             exit 0
           fi
-          git commit -m "docs(pad-notes-android): update emulator screenshots [skip ci]"
+          git commit -m "docs(pad-notes-android): update emulator screenshots [skip ci]" \
+            -m "Co-authored-by: tys-T <181165180+tys-T@users.noreply.github.com>"
           git push origin HEAD:${{ github.event.pull_request.head.ref }}

@@ -69,9 +69,9 @@ class AssistantService : Service() {
         private const val CHANNEL_ID = "suimo_overlay"
         private const val NOTIFICATION_ID = 0x5701
         private const val FRAME_INTERVAL_MS = 1200L
-        private const val SNAPSHOT_TIMEOUT_MS = 2400L
-        private const val OVERLAY_HIDE_SETTLE_MS = 650L
-        private const val FRESH_FRAME_SETTLE_MS = 350L
+        private const val SNAPSHOT_TIMEOUT_MS = 2600L
+        private const val OVERLAY_HIDE_SETTLE_MS = 1500L
+        private const val FRESH_FRAME_MARGIN_MS = 500L
 
         @Volatile
         var isRunning: Boolean = false
@@ -107,12 +107,11 @@ class AssistantService : Service() {
 
     private var latestFrame: Bitmap? = null
     private var latestFrameAt = 0L
-    private var latestFrameNanos = 0L
     private var lastStoredAt = 0L
 
     private var pendingSnapshotId: Any? = null
     private var pendingSnapshot: ((Bitmap?) -> Unit)? = null
-    private var pendingSnapshotMinNanos = 0L
+    private var pendingSnapshotMinTime = 0L
     private var analysisJob: Job? = null
     private var previousTitles = mutableListOf<String>()
     private val demoDeck by lazy { DemoDeck(buildDemoPatterns()) }
@@ -296,18 +295,6 @@ class AssistantService : Service() {
         }
     }
 
-    /**
-     * Creating a fresh mirror after the floating window is hidden guarantees
-     * that the first frame comes from the current composition. Reusing the
-     * old reader can hand back a queued frame that still contains our panel.
-     */
-    private fun recreateCaptureForFreshFrame() {
-        latestFrame = null
-        latestFrameAt = 0L
-        latestFrameNanos = 0L
-        createVirtualDisplay()
-    }
-
     private fun releaseVirtualDisplay() {
         imageReader?.setOnImageAvailableListener(null, null)
         runCatching { virtualDisplay?.release() }
@@ -331,7 +318,6 @@ class AssistantService : Service() {
         val image = runCatching { reader.acquireLatestImage() }.getOrNull() ?: return
         try {
             val capturedAt = SystemClock.elapsedRealtime()
-            val capturedAtNanos = image.timestamp.takeIf { it > 0L } ?: System.nanoTime()
             val wantImmediately = pendingSnapshot != null
             if (!wantImmediately && capturedAt - lastStoredAt < FRAME_INTERVAL_MS) return
             val bitmap = runCatching { ImageTools.imageToBitmap(image) }.getOrNull() ?: return
@@ -340,10 +326,9 @@ class AssistantService : Service() {
                 if (destroyed || generation != captureGeneration) return@post
                 latestFrame = bitmap
                 latestFrameAt = capturedAt
-                latestFrameNanos = capturedAtNanos
                 val callback = pendingSnapshot
                 val id = pendingSnapshotId
-                if (callback != null && id != null && latestFrameNanos >= pendingSnapshotMinNanos) {
+                if (callback != null && id != null && latestFrameAt >= pendingSnapshotMinTime) {
                     pendingSnapshot = null
                     pendingSnapshotId = null
                     callback(bitmap)
@@ -359,10 +344,10 @@ class AssistantService : Service() {
      * frame captured after that moment is accepted (used to avoid capturing our
      * own floating window).
      */
-    private suspend fun requestSnapshot(minNanos: Long = 0L): Bitmap? {
+    private suspend fun requestSnapshot(minTimestamp: Long = 0L): Bitmap? {
         val fresh = latestFrame
         if (fresh != null && !fresh.isRecycled &&
-            latestFrameNanos >= minNanos &&
+            latestFrameAt >= minTimestamp &&
             SystemClock.elapsedRealtime() - latestFrameAt < 1500
         ) {
             return fresh
@@ -376,7 +361,7 @@ class AssistantService : Service() {
             }
             val id = Any()
             pendingSnapshotId = id
-            pendingSnapshotMinNanos = minNanos
+            pendingSnapshotMinTime = minTimestamp
             pendingSnapshot = { bitmap ->
                 if (pendingSnapshotId === id) {
                     pendingSnapshotId = null
@@ -390,9 +375,7 @@ class AssistantService : Service() {
                     pendingSnapshot = null
                     val frame = latestFrame
                     deliver(
-                        if (frame != null && !frame.isRecycled &&
-                            latestFrameNanos >= minNanos
-                        ) {
+                        if (frame != null && !frame.isRecycled && latestFrameAt >= minTimestamp) {
                             frame
                         } else {
                             null
@@ -436,10 +419,9 @@ class AssistantService : Service() {
                     return@launch
                 }
                 overlay?.removeForCapture()
+                val hideAt = SystemClock.elapsedRealtime()
                 delay(OVERLAY_HIDE_SETTLE_MS)
-                recreateCaptureForFreshFrame()
-                delay(FRESH_FRAME_SETTLE_MS)
-                val frame = requestSnapshot()
+                val frame = requestSnapshot(minTimestamp = hideAt + FRESH_FRAME_MARGIN_MS)
                 ensureActive()
                 if (frame == null) {
                     overlay?.showError(getString(R.string.toast_capture_failed))
@@ -479,12 +461,11 @@ class AssistantService : Service() {
         }
         analysisJob?.cancel()
         overlay?.removeForCapture()
+        val hideAt = SystemClock.elapsedRealtime()
         serviceScope.launch {
             try {
                 delay(OVERLAY_HIDE_SETTLE_MS)
-                recreateCaptureForFreshFrame()
-                delay(FRESH_FRAME_SETTLE_MS)
-                val frame = requestSnapshot()
+                val frame = requestSnapshot(minTimestamp = hideAt + FRESH_FRAME_MARGIN_MS)
                 if (frame == null) {
                     overlay?.showError(getString(R.string.toast_capture_failed))
                     return@launch
