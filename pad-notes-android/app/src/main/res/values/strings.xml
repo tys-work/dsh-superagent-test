@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">随墨 · 悬浮建议</string>
+    <string name="brand_name">随墨</string>
+    <string name="brand_sub">SUIMO · ANDROID</string>
+    <string name="brand_tag">旁路采集 · 悬浮建议</string>
+
+    <string name="hero_title">边写边想，AI 在旁。</string>
+    <string name="hero_body">读取你正在使用的笔记 App，裁剪后交给同一个 AI；建议悬浮在屏幕上，不打断书写。</string>
+
+    <string name="status_title">运行状态</string>
+    <string name="overlay_permission">悬浮窗权限</string>
+    <string name="overlay_granted">已授权</string>
+    <string name="overlay_missing">未授权</string>
+    <string name="grant">去授权</string>
+    <string name="screen_capture">屏幕采集</string>
+    <string name="capture_running">采集中</string>
+    <string name="capture_idle">未开始</string>
+    <string name="status_hint">Android 14 及以上可以把采集范围限制在单个 App；系统弹窗里选择当前笔记 App 即可。</string>
+
+    <string name="start">开始悬浮建议</string>
+    <string name="stop">停止悬浮建议</string>
+    <string name="start_hint">开始后，切到任意笔记 App；轻点屏幕边缘的墨点即可读取这一屏。</string>
+    <string name="start_hint_demo">当前是本地演示模式：不会上传屏幕，只展示悬浮窗与建议排版。</string>
+
+    <string name="ai_title">AI 服务</string>
+    <string name="save">保存</string>
+    <string name="provider_label">服务商</string>
+    <string name="base_url_label">Base URL</string>
+    <string name="base_url_hint">https://api.openai.com/v1</string>
+    <string name="model_label">模型名称</string>
+    <string name="model_hint">gpt-4o-mini</string>
+    <string name="api_key_label">API Key</string>
+    <string name="api_key_hint">sk-…</string>
+    <string name="show_key">显示</string>
+    <string name="hide_key">隐藏</string>
+    <string name="test_connection">测试连接</string>
+    <string name="testing">正在测试…</string>
+    <string name="test_ok">连接成功</string>
+    <string name="test_failed">连接失败：%1$s</string>
+
+    <string name="crop_title">采集区域</string>
+    <string name="crop_reset">恢复全屏</string>
+    <string name="crop_full">全屏（未裁剪）</string>
+    <string name="crop_summary">左 %1$d%% · 上 %2$d%% · 右 %3$d%% · 下 %4$d%%</string>
+    <string name="crop_hint">开始悬浮后，在悬浮面板中点「框选区域」，直接在当前屏幕上拖出要交给 AI 的范围。</string>
+
+    <string name="howto_title">怎么用</string>
+    <string name="howto_1">1. 设置 AI 服务，或先用「本地演示」体验悬浮建议。</string>
+    <string name="howto_2">2. 授予悬浮窗权限，点「开始悬浮建议」，在系统弹窗里选择共享单个应用或整个屏幕。</string>
+    <string name="howto_3">3. 切到笔记 App 继续书写；轻点墨点读取这一屏，建议会出现在悬浮卡片里。</string>
+    <string name="footer">本地优先：API Key 只保存在这台设备；只有点「分析这一屏」时，才会把裁剪后的画面发送给你配置的 AI。</string>
+
+    <string name="overlay_panel_sub">实时建议 · 悬浮</string>
+    <string name="overlay_welcome">轻点墨点或下面的按钮，读取当前屏幕并给出 1–3 条建议。</string>
+    <string name="overlay_analyze">分析这一屏</string>
+    <string name="overlay_crop">框选区域</string>
+    <string name="overlay_settings">打开设置</string>
+    <string name="overlay_collapse">收起</string>
+    <string name="overlay_loading">正在阅读这一屏…</string>
+    <string name="overlay_empty">这一屏还没有建议。可以换一页笔记，或再分析一次。</string>
+    <string name="overlay_retry">重试</string>
+    <string name="overlay_close">关闭</string>
+    <string name="overlay_bubble_desc">随墨：轻点分析屏幕，长按打开面板</string>
+    <string name="overlay_crop_title">拖动边框，选择要交给 AI 的区域</string>
+    <string name="overlay_crop_hint">只截取这个范围，减少无关内容与流量。</string>
+    <string name="overlay_crop_confirm">确定</string>
+    <string name="overlay_crop_cancel">取消</string>
+    <string name="overlay_crop_updated">采集区域已更新</string>
+    <string name="overlay_crop_analyze">确定并分析</string>
+
+    <string name="notif_channel">悬浮建议</string>
+    <string name="notif_title">随墨正在读取屏幕</string>
+    <string name="notif_text">轻点回到设置；悬浮墨点可在任意 App 上方使用。</string>
+    <string name="notif_stop">停止</string>
+
+    <string name="toast_overlay_needed">请先授予悬浮窗权限</string>
+    <string name="toast_capture_failed">暂时读不到屏幕，请稍后重试</string>
+    <string name="toast_saved">设置已保存</string>
+    <string name="toast_no_screen">屏幕采集未启动，请先点「开始悬浮建议」</string>
+    <string name="toast_api_missing">请先填写 Base URL、模型名称与 API Key</string>
+    <string name="toast_starting">正在启动屏幕采集…</string>
+    <string name="toast_projection_stopped">屏幕共享已停止，请回到设置重新开始。</string>
+
+    <string name="type_insight">洞察</string>
+    <string name="type_check">检查</string>
+    <string name="type_extend">拓展</string>
+    <string name="type_question">提问</string>
+
+    <string name="demo_reading">本地演示 · 未读取屏幕</string>
+    <string name="demo_suggestion_1_title">先接上你的模型</string>
+    <string name="demo_suggestion_1_body">在设置里填入任意 OpenAI 兼容服务的 Base URL、模型与 Key，就能读取真实屏幕。</string>
+    <string name="demo_suggestion_2_title">把采集区域收窄</string>
+    <string name="demo_suggestion_2_body">框选笔记正文区域即可；范围越准，建议越贴近你正在写的内容。</string>
+    <string name="demo_suggestion_3_title">悬浮窗不会抢焦点</string>
+    <string name="demo_suggestion_3_body">建议卡片停在笔记 App 上方，读屏和书写都不会被打断。</string>
+    <string name="demo_suggestion_4_title">先写下问题</string>
+    <string name="demo_suggestion_4_body">把还没想通的地方写成一句话，建议会更具体。</string>
+    <string name="demo_suggestion_5_title">留一处空白</string>
+    <string name="demo_suggestion_5_body">在页面下方留一块空白，给下一步推理。</string>
+    <string name="demo_suggestion_6_title">举一个反例</string>
+    <string name="demo_suggestion_6_body">试着找反例，检验刚才的结论。</string>
+    <string name="demo_suggestion_7_title">圈出关键词</string>
+    <string name="demo_suggestion_7_body">回看时只看圈出的词，检查结构是否完整。</string>
+    <string name="demo_suggestion_8_title">换一种说法</string>
+    <string name="demo_suggestion_8_body">用一句更短的话复述这页内容。</string>
+    <string name="demo_suggestion_9_title">下一小步</string>
+    <string name="demo_suggestion_9_body">把接下来要做的动作写成一行。</string>
+    <string name="demo_cooldown">演示建议每 8 秒最多更新一次，请稍后再试。</string>
+</resources>

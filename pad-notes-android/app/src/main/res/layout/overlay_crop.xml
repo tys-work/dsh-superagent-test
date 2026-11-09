@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/scrim">
+
+    <com.suimo.assistant.overlay.CropView
+        android:id="@+id/cropView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:background="#B3141210"
+        android:orientation="vertical"
+        android:paddingLeft="20dp"
+        android:paddingTop="16dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="14dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/overlay_crop_title"
+            android:textColor="#FFF1EBDF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="@string/overlay_crop_hint"
+            android:textColor="#B3F1EBDF"
+            android:textSize="11.5sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#B3141210"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:paddingLeft="20dp"
+        android:paddingTop="12dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="18dp">
+
+        <TextView
+            android:id="@+id/cropCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:minWidth="88dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/overlay_crop_cancel"
+            android:textColor="#FFF1EBDF"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/cropConfirm"
+            style="@style/Widget.Suimo.PrimaryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="46dp"
+            android:layout_marginStart="12dp"
+            android:minWidth="112dp"
+            android:text="@string/overlay_crop_confirm" />
+    </LinearLayout>
+</FrameLayout>
