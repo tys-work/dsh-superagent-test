@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   checks:
@@ -62,6 +62,8 @@ jobs:
       ADB: /usr/local/lib/android/sdk/platform-tools/adb
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -113,3 +115,15 @@ jobs:
           name: pad-notes-android-emulator-log
           path: /tmp/emulator.log
           if-no-files-found: warn
+      - name: Commit screenshots back to the PR branch
+        if: always()
+        run: |
+          git config user.name "tys-work"
+          git config user.email "351982172+tys-work@users.noreply.github.com"
+          git add pad-notes-android/docs/screenshots
+          if git diff --cached --quiet; then
+            echo "No screenshot changes to commit."
+            exit 0
+          fi
+          git commit -m "docs(pad-notes-android): update emulator screenshots [skip ci]"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}

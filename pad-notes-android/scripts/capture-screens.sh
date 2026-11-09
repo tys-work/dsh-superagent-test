@@ -107,18 +107,23 @@ else:
 }
 
 panel_close_xy() {
-  local frame
-  frame=$(panel_frame) || { echo "no panel frame"; return 1; }
-  set -- $frame
-  tap_xy $(($3 - $(dp 33))) $(($2 + $(dp 31)))
+  # Panel x = right edge 12dp; close button centre is 33dp from its right and
+  # 31dp from its top (panel top = 52dp).
+  tap_xy $((SCREEN_W - $(dp 45))) $(( $(dp 52) + $(dp 31) ))
 }
 
 panel_crop_xy() {
   local frame
-  frame=$(panel_frame) || { echo "no panel frame"; return 1; }
-  set -- $frame
-  # Bottom row: bottom padding 14 + link row 36 + gap 4 + half of 46.
-  tap_xy $(($3 - $(dp 57))) $(($4 - $(dp 77)))
+  frame=$(panel_frame) || true
+  if [ -n "${frame:-}" ]; then
+    set -- $frame
+    # Bottom row: bottom padding 14 + link row 36 + gap 4 + half of 46.
+    tap_xy $(($3 - $(dp 57))) $(($4 - $(dp 77)))
+  else
+    # Welcome panel is roughly 220dp tall; the crop button sits above the
+    # footer rows. This fallback is only used when dumpsys has no frame.
+    tap_xy $((SCREEN_W - $(dp 69))) $(( $(dp 52) + $(dp 143)))
+  fi
 }
 
 bubble_tap() {
@@ -127,11 +132,11 @@ bubble_tap() {
 }
 
 collapse_panel() {
-  tap_text "收起" || panel_close_xy || true
+  panel_close_xy || true
 }
 
 open_crop_panel() {
-  tap_text "框选区域" || panel_crop_xy || true
+  panel_crop_xy || true
 }
 
 start_overlay() {
@@ -183,19 +188,20 @@ scroll_down
 start_overlay
 shot 05-android-overlay-panel
 
-# 4. Collapse to the ink dot above the launcher, then read a screen in demo mode.
-"$ADB" shell input keyevent KEYCODE_HOME || true
-sleep 2
-collapse_panel
-sleep 1
-bubble_tap
-sleep 2
-shot 06-android-overlay-suggestions
-
-# 5. Crop selector over the current screen.
+# 4. Open the crop selector from the welcome panel.
+"$ADB" shell dumpsys window > "$OUT/dumpsys-window.txt" 2>&1 || true
 open_crop_panel
 sleep 2
-shot 07-android-crop
-tap_text "取消" || tap_xy $((SCREEN_W - $(dp 188))) $((SCREEN_H - $(dp 41))) || true
+shot 06-android-crop
+tap_xy $((SCREEN_W - $(dp 188))) $((SCREEN_H - $(dp 41)))
+sleep 1
+
+# 5. Collapse to the ink dot above the launcher, then read a screen in demo mode.
+tap_xy $((SCREEN_W - $(dp 45))) $(( $(dp 52) + $(dp 31) ))
+"$ADB" shell input keyevent KEYCODE_HOME || true
+sleep 2
+bubble_tap
+sleep 2
+shot 07-android-overlay-suggestions
 
 echo "done"
