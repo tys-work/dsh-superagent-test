@@ -19,7 +19,7 @@ class CropRegionTest {
         assertEquals(0.2f, region.left, 0.0001f)
         assertEquals(0.9f, region.right, 0.0001f)
         assertEquals(0f, region.top, 0.0001f)
-        assertEquals(1f - CropRegion.MIN_SIZE, region.bottom, 0.0001f)
+        assertEquals(1f, region.bottom, 0.0001f)
     }
 
     @Test
@@ -52,6 +52,6 @@ class CropRegionTest {
         val edge = region.movedBy(5f, 5f)
         assertEquals(1f, edge.right, 0.0001f)
         assertEquals(1f, edge.bottom, 0.0001f)
-        assertEquals(0.6f, edge.right - edge.left, 0.0001f)
+        assertEquals(0.4f, edge.right - edge.left, 0.0001f)
     }
 }

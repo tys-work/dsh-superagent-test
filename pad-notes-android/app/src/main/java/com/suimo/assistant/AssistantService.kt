@@ -257,10 +257,10 @@ class AssistantService : Service() {
         releaseVirtualDisplay()
         try {
             val reader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 3)
-            val thread = frameThread ?: HandlerThread("suimo-frames").also {
-                it.start()
-                frameThread = it
-                frameHandler = Handler(it.looper)
+            if (frameThread == null) {
+                val newThread = HandlerThread("suimo-frames").also { it.start() }
+                frameThread = newThread
+                frameHandler = Handler(newThread.looper)
             }
             reader.setOnImageAvailableListener({ source -> onImageAvailable(source) }, frameHandler)
             val newDisplay = mediaProjection.createVirtualDisplay(
