@@ -71,6 +71,7 @@ class AssistantService : Service() {
         private const val FRAME_INTERVAL_MS = 1200L
         private const val SNAPSHOT_TIMEOUT_MS = 2400L
         private const val OVERLAY_HIDE_SETTLE_MS = 650L
+        private const val FRESH_FRAME_SETTLE_MS = 350L
 
         @Volatile
         var isRunning: Boolean = false
@@ -102,6 +103,7 @@ class AssistantService : Service() {
     private var frameThread: HandlerThread? = null
     private var frameHandler: Handler? = null
     private var captureSize: Pair<Int, Int>? = null
+    private var captureGeneration = 0
 
     private var latestFrame: Bitmap? = null
     private var latestFrameAt = 0L
@@ -265,7 +267,11 @@ class AssistantService : Service() {
                 frameThread = newThread
                 frameHandler = Handler(newThread.looper)
             }
-            reader.setOnImageAvailableListener({ source -> onImageAvailable(source) }, frameHandler)
+            val generation = ++captureGeneration
+            reader.setOnImageAvailableListener(
+                { source -> onImageAvailable(source, generation) },
+                frameHandler,
+            )
             val newDisplay = mediaProjection.createVirtualDisplay(
                 "suimo-capture",
                 width,
@@ -290,6 +296,18 @@ class AssistantService : Service() {
         }
     }
 
+    /**
+     * Creating a fresh mirror after the floating window is hidden guarantees
+     * that the first frame comes from the current composition. Reusing the
+     * old reader can hand back a queued frame that still contains our panel.
+     */
+    private fun recreateCaptureForFreshFrame() {
+        latestFrame = null
+        latestFrameAt = 0L
+        latestFrameNanos = 0L
+        createVirtualDisplay()
+    }
+
     private fun releaseVirtualDisplay() {
         imageReader?.setOnImageAvailableListener(null, null)
         runCatching { virtualDisplay?.release() }
@@ -309,7 +327,7 @@ class AssistantService : Service() {
         if (target != captureSize) createVirtualDisplay()
     }
 
-    private fun onImageAvailable(reader: ImageReader) {
+    private fun onImageAvailable(reader: ImageReader, generation: Int) {
         val image = runCatching { reader.acquireLatestImage() }.getOrNull() ?: return
         try {
             val capturedAt = SystemClock.elapsedRealtime()
@@ -319,7 +337,7 @@ class AssistantService : Service() {
             val bitmap = runCatching { ImageTools.imageToBitmap(image) }.getOrNull() ?: return
             lastStoredAt = capturedAt
             mainHandler.post {
-                if (destroyed) return@post
+                if (destroyed || generation != captureGeneration) return@post
                 latestFrame = bitmap
                 latestFrameAt = capturedAt
                 latestFrameNanos = capturedAtNanos
@@ -418,9 +436,10 @@ class AssistantService : Service() {
                     return@launch
                 }
                 overlay?.removeForCapture()
-                val hideAt = System.nanoTime()
                 delay(OVERLAY_HIDE_SETTLE_MS)
-                val frame = requestSnapshot(minNanos = hideAt)
+                recreateCaptureForFreshFrame()
+                delay(FRESH_FRAME_SETTLE_MS)
+                val frame = requestSnapshot()
                 ensureActive()
                 if (frame == null) {
                     overlay?.showError(getString(R.string.toast_capture_failed))
@@ -460,11 +479,12 @@ class AssistantService : Service() {
         }
         analysisJob?.cancel()
         overlay?.removeForCapture()
-        val hideAt = System.nanoTime()
         serviceScope.launch {
             try {
                 delay(OVERLAY_HIDE_SETTLE_MS)
-                val frame = requestSnapshot(minNanos = hideAt)
+                recreateCaptureForFreshFrame()
+                delay(FRESH_FRAME_SETTLE_MS)
+                val frame = requestSnapshot()
                 if (frame == null) {
                     overlay?.showError(getString(R.string.toast_capture_failed))
                     return@launch
