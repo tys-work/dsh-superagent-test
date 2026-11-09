@@ -1,7 +1,7 @@
 package com.suimo.assistant.util
 
 import android.graphics.Bitmap
-import android.graphics.ImageFormat
+import android.graphics.PixelFormat
 import android.media.Image
 import com.suimo.assistant.data.CropRegion
 import java.io.ByteArrayOutputStream
@@ -14,7 +14,7 @@ object ImageTools {
 
     /** Converts an RGBA_8888 MediaProjection frame, respecting row padding. */
     fun imageToBitmap(image: Image): Bitmap {
-        require(image.format == ImageFormat.RGBA_8888 || image.format == ImageFormat.FLEX_RGBA_8888) {
+        require(image.format == PixelFormat.RGBA_8888) {
             "Unexpected image format ${image.format}"
         }
         val plane = image.planes[0]
