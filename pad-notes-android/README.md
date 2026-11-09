@@ -95,4 +95,18 @@ pad-notes-android/
 
 ## 截图
 
-`screenshots/` 中的图片由 GitHub Actions 模拟器直接截取，不是设计稿或网页截图；生成方式见 `scripts/capture-screens.sh`。
+下面这些图片由 GitHub Actions 在 API 34 平板模拟器上安装并运行 APK 后直接截取（`adb exec-out screencap`），不是设计稿；生成与回写方式见 `scripts/capture-screens.sh` 和 `.github/workflows/pad-notes-android.yml`。
+
+| 浅色 · 设置 | 浅色 · AI 配置 |
+| --- | --- |
+| ![浅色设置](docs/screenshots/01-android-settings-light.png) | ![浅色 AI 配置](docs/screenshots/02-android-settings-ai-light.png) |
+
+| 深色 · 设置 | 深色 · AI 配置 |
+| --- | --- |
+| ![深色设置](docs/screenshots/03-android-settings-dark.png) | ![深色 AI 配置](docs/screenshots/04-android-settings-ai-dark.png) |
+
+| 悬浮面板 | 框选区域 | 悬浮建议 |
+| --- | --- | --- |
+| ![悬浮面板](docs/screenshots/05-android-overlay-panel.png) | ![框选区域](docs/screenshots/06-android-crop.png) | ![悬浮建议](docs/screenshots/07-android-overlay-suggestions.png) |
+
+截图背景里的启动器时钟是模拟器自带的桌面组件；应用本身不包含它。

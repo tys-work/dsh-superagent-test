@@ -190,7 +190,7 @@ start_overlay
 shot 05-android-overlay-panel
 
 # 4. Open the crop selector from the welcome panel.
-"$ADB" shell dumpsys window > "$OUT/dumpsys-window.txt" 2>&1 || true
+"$ADB" shell dumpsys window > /tmp/suimo-window.txt 2>&1 || true
 open_crop_panel
 sleep 2
 shot 06-android-crop
