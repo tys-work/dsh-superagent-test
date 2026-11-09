@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import com.suimo.assistant.ai.AiClient
 import com.suimo.assistant.ai.AiException
 import com.suimo.assistant.ai.Analysis
+import com.suimo.assistant.ai.DemoDeck
 import com.suimo.assistant.ai.Suggestion
 import com.suimo.assistant.ai.SuggestionType
 import com.suimo.assistant.data.Settings
@@ -111,6 +112,7 @@ class AssistantService : Service() {
     private var pendingSnapshotMinTime = 0L
     private var analysisJob: Job? = null
     private var previousTitles = mutableListOf<String>()
+    private val demoDeck by lazy { DemoDeck(buildDemoPatterns()) }
 
     private val displayListener = object : DisplayManager.DisplayListener {
         override fun onDisplayAdded(displayId: Int) = Unit
@@ -387,14 +389,23 @@ class AssistantService : Service() {
     }
 
     private fun analyze() {
+        if (projection == null) {
+            overlay?.showError(getString(R.string.toast_no_screen))
+            return
+        }
         val settings = settingsStore.load()
         analysisJob?.cancel()
         analysisJob = serviceScope.launch {
             try {
                 if (settings.isDemo) {
+                    val pattern = demoDeck.next(SystemClock.elapsedRealtime())
+                    if (pattern == null) {
+                        overlay?.toast(getString(R.string.demo_cooldown))
+                        return@launch
+                    }
                     overlay?.showLoading()
                     delay(650)
-                    overlay?.showAnalysis(demoAnalysis())
+                    overlay?.showAnalysis(pattern)
                     return@launch
                 }
                 if (!settings.isConfigured) {
@@ -473,26 +484,67 @@ class AssistantService : Service() {
         }
     }
 
-    private fun demoAnalysis(): Analysis = Analysis(
-        reading = getString(R.string.demo_reading),
-        suggestions = listOf(
-            Suggestion(
-                SuggestionType.INSIGHT,
-                getString(R.string.demo_suggestion_1_title),
-                getString(R.string.demo_suggestion_1_body),
+    private fun buildDemoPatterns(): List<Analysis> {
+        fun pattern(vararg items: Triple<SuggestionType, Int, Int>): Analysis = Analysis(
+            reading = getString(R.string.demo_reading),
+            suggestions = items.map { (type, title, body) ->
+                Suggestion(type, getString(title), getString(body))
+            },
+        )
+        return listOf(
+            pattern(
+                Triple(
+                    SuggestionType.INSIGHT,
+                    R.string.demo_suggestion_1_title,
+                    R.string.demo_suggestion_1_body,
+                ),
+                Triple(
+                    SuggestionType.EXTEND,
+                    R.string.demo_suggestion_2_title,
+                    R.string.demo_suggestion_2_body,
+                ),
+                Triple(
+                    SuggestionType.QUESTION,
+                    R.string.demo_suggestion_3_title,
+                    R.string.demo_suggestion_3_body,
+                ),
             ),
-            Suggestion(
-                SuggestionType.EXTEND,
-                getString(R.string.demo_suggestion_2_title),
-                getString(R.string.demo_suggestion_2_body),
+            pattern(
+                Triple(
+                    SuggestionType.CHECK,
+                    R.string.demo_suggestion_4_title,
+                    R.string.demo_suggestion_4_body,
+                ),
+                Triple(
+                    SuggestionType.INSIGHT,
+                    R.string.demo_suggestion_5_title,
+                    R.string.demo_suggestion_5_body,
+                ),
+                Triple(
+                    SuggestionType.EXTEND,
+                    R.string.demo_suggestion_6_title,
+                    R.string.demo_suggestion_6_body,
+                ),
             ),
-            Suggestion(
-                SuggestionType.QUESTION,
-                getString(R.string.demo_suggestion_3_title),
-                getString(R.string.demo_suggestion_3_body),
+            pattern(
+                Triple(
+                    SuggestionType.EXTEND,
+                    R.string.demo_suggestion_7_title,
+                    R.string.demo_suggestion_7_body,
+                ),
+                Triple(
+                    SuggestionType.QUESTION,
+                    R.string.demo_suggestion_8_title,
+                    R.string.demo_suggestion_8_body,
+                ),
+                Triple(
+                    SuggestionType.INSIGHT,
+                    R.string.demo_suggestion_9_title,
+                    R.string.demo_suggestion_9_body,
+                ),
             ),
-        ),
-    )
+        )
+    }
 
     private fun onProjectionStopped() {
         if (destroyed) return

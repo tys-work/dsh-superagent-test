@@ -94,4 +94,17 @@
     <string name="demo_suggestion_2_body">框选笔记正文区域即可；范围越准，建议越贴近你正在写的内容。</string>
     <string name="demo_suggestion_3_title">悬浮窗不会抢焦点</string>
     <string name="demo_suggestion_3_body">建议卡片停在笔记 App 上方，读屏和书写都不会被打断。</string>
+    <string name="demo_suggestion_4_title">先写下问题</string>
+    <string name="demo_suggestion_4_body">把还没想通的地方写成一句话，建议会更具体。</string>
+    <string name="demo_suggestion_5_title">留一处空白</string>
+    <string name="demo_suggestion_5_body">在页面下方留一块空白，给下一步推理。</string>
+    <string name="demo_suggestion_6_title">举一个反例</string>
+    <string name="demo_suggestion_6_body">试着找反例，检验刚才的结论。</string>
+    <string name="demo_suggestion_7_title">圈出关键词</string>
+    <string name="demo_suggestion_7_body">回看时只看圈出的词，检查结构是否完整。</string>
+    <string name="demo_suggestion_8_title">换一种说法</string>
+    <string name="demo_suggestion_8_body">用一句更短的话复述这页内容。</string>
+    <string name="demo_suggestion_9_title">下一小步</string>
+    <string name="demo_suggestion_9_body">把接下来要做的动作写成一行。</string>
+    <string name="demo_cooldown">演示建议每 8 秒最多更新一次，请稍后再试。</string>
 </resources>
