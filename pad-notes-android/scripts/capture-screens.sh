@@ -107,9 +107,10 @@ else:
 }
 
 panel_close_xy() {
-  # Panel x = right edge 12dp; close button centre is 33dp from its right and
-  # 31dp from its top (panel top = 52dp).
-  tap_xy $((SCREEN_W - $(dp 45))) $(( $(dp 52) + $(dp 31) ))
+  # Observed on the API 34 tablet AVD: the overlay window is inset below the
+  # status bar, so the close target is 113dp from the screen top and 45dp from
+  # the right edge.
+  tap_xy $((SCREEN_W - $(dp 45))) $(dp 113)
 }
 
 panel_crop_xy() {
@@ -120,9 +121,9 @@ panel_crop_xy() {
     # Bottom row: bottom padding 14 + link row 36 + gap 4 + half of 46.
     tap_xy $(($3 - $(dp 57))) $(($4 - $(dp 77)))
   else
-    # Welcome panel is roughly 220dp tall; the crop button sits above the
-    # footer rows. This fallback is only used when dumpsys has no frame.
-    tap_xy $((SCREEN_W - $(dp 69))) $(( $(dp 52) + $(dp 143)))
+    # Welcome panel: crop button sits above the footer rows (same x as the
+    # measured panel, y observed at 228dp on the tablet AVD).
+    tap_xy $((SCREEN_W - $(dp 69))) $(dp 228)
   fi
 }
 
@@ -193,11 +194,12 @@ shot 05-android-overlay-panel
 open_crop_panel
 sleep 2
 shot 06-android-crop
-tap_xy $((SCREEN_W - $(dp 188))) $((SCREEN_H - $(dp 41)))
+"$ADB" shell input keyevent KEYCODE_BACK || true
 sleep 1
 
 # 5. Collapse to the ink dot above the launcher, then read a screen in demo mode.
-tap_xy $((SCREEN_W - $(dp 45))) $(( $(dp 52) + $(dp 31) ))
+collapse_panel
+sleep 1
 "$ADB" shell input keyevent KEYCODE_HOME || true
 sleep 2
 bubble_tap
