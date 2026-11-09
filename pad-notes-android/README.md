@@ -9,6 +9,7 @@
 - **单 App 共享**：Android 14+ 走 `MediaProjectionConfig.createConfigForUserChoice()`，在系统弹窗里可以只共享当前笔记 App，减少无关内容。
 - **可调裁剪**：悬浮面板里点「框选区域」，在冻结的画面上拖出要交给 AI 的范围；只上传这个范围。
 - **同一个 AI**：OpenAI / DeepSeek / Moonshot Kimi / 通义千问 / 自定义 OpenAI 兼容端点，提示词与 JSON 契约直接沿用 `pad-notes-ai/js/ai.js`。
+- **避免设置页误报**：提示词会忽略随墨自己的设置字段；如果模型仍建议“补全 https://”而保存的 Base URL 已是完整绝对 URL，结果过滤会丢弃这类误报，判断只使用保存后的值。
 - **本地优先**：API Key 只存在本机 `SharedPreferences`；没有账号、没有服务端、没有埋点；只有点「分析这一屏」时才发送裁剪后的截图。
 - **演示模式有节流**：本地演示每 8 秒最多更新一次建议，并轮换 3 组 pattern，不会连续推送同一组；它不使用「第 N 次建议」这类无限累计计数。
 
@@ -89,7 +90,7 @@ pad-notes-android/
 
 ## 验证
 
-- `./gradlew :app:testDebugUnitTest`：20 个 JVM 单测，覆盖提示词契约、建议 JSON 容错、服务商端点、裁剪坐标映射，以及演示建议的 8 秒节流 / pattern 轮换。
+- `./gradlew :app:testDebugUnitTest`：26 个 JVM 单测，覆盖提示词契约、建议 JSON 容错、服务商端点、裁剪坐标映射、设置页误报过滤，以及演示建议的 8 秒节流 / pattern 轮换。
 - `./gradlew :app:lintDebug :app:assembleDebug`：Android Lint 与 Debug APK 构建。
 - GitHub Actions 的 `pad-notes-android` 工作流在 API 34 模拟器上安装 APK、授予悬浮窗权限、启动屏幕共享，并截取设置页、悬浮面板、建议卡片和框选界面。
 

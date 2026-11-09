@@ -30,7 +30,10 @@ object AiClient {
         if (content.isBlank()) {
             throw AiException("AI 返回了空内容，请稍后重试或检查模型。", code = "empty")
         }
-        return SuggestionParser.parse(content)
+        return SuggestionSanitizer.sanitize(
+            SuggestionParser.parse(content),
+            settings.baseUrl,
+        )
     }
 
     suspend fun testConnection(settings: Settings): String {
