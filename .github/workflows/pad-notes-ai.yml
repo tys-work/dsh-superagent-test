@@ -1,0 +1,28 @@
+name: pad-notes-ai
+
+on:
+  pull_request:
+    paths:
+      - "pad-notes-ai/**"
+      - ".github/workflows/pad-notes-ai.yml"
+  push:
+    branches: [main]
+    paths:
+      - "pad-notes-ai/**"
+      - ".github/workflows/pad-notes-ai.yml"
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pad-notes-ai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax and asset checks
+        run: npm run check
+      - name: Unit tests
+        run: node scripts/test.mjs

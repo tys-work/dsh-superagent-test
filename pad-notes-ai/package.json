@@ -1,0 +1,22 @@
+{
+  "name": "suimo-pad-notes-ai",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "随墨 Suimo — 写给 Android 平板的本地优先手写笔记与实时 AI 助手",
+  "scripts": {
+    "start": "node server.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node scripts/check.mjs && node scripts/test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "notes",
+    "tablet",
+    "handwriting",
+    "ai",
+    "openai-compatible"
+  ]
+}

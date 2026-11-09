@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>随墨 · 平板笔记 AI 助手</title>
+    <meta
+      name="description"
+      content="随墨是一个写给 Android 平板的手写笔记 AI 助手：边写边获得实时建议，随时就当前笔记提问。"
+    />
+    <meta name="theme-color" content="#f2eee6" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="assets/icon-192.png" />
+    <script>
+      try {
+        const saved = JSON.parse(localStorage.getItem("suimo.settings.v1") || "{}");
+        const theme = ["light", "dark"].includes(saved.theme)
+          ? saved.theme
+          : matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+        document.documentElement.dataset.theme = theme;
+      } catch {}
+    </script>
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+  <body>
+    <svg class="sprite" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="i-logo" viewBox="0 0 32 32">
+        <path
+          d="M16.4 4.2c3.9 4.7 7 8.3 7 12.1a7 7 0 0 1-14 0c0-3.8 3.1-7.4 7-12.1Z"
+          fill="currentColor"
+        />
+        <path
+          d="M12.6 18.4c.3 2 1.8 3.3 3.7 3.4"
+          fill="none"
+          stroke="var(--logo-stroke, #fff8f0)"
+          stroke-linecap="round"
+          stroke-width="1.6"
+        />
+        <path
+          d="m25 4.5.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2Z"
+          fill="currentColor"
+          opacity=".75"
+        />
+      </symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24">
+        <path d="M4 7h16M4 12h16M4 17h11" />
+      </symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.2 4.2" />
+      </symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24">
+        <path d="M4 7h8M16 7h4M4 12h3M11 12h9M4 17h11M19 17h1" />
+        <circle cx="14" cy="7" r="2" /><circle cx="9" cy="12" r="2" /><circle cx="17" cy="17" r="2" />
+      </symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4" />
+      </symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24">
+        <path d="M20.2 15.2A8.6 8.6 0 0 1 8.8 3.8a8.6 8.6 0 1 0 11.4 11.4Z" />
+      </symbol>
+      <symbol id="i-sparkles" viewBox="0 0 24 24">
+        <path d="m12 3 1.7 4.8L18.5 9.5l-4.8 1.7L12 16l-1.7-4.8L5.5 9.5l4.8-1.7L12 3Z" fill="currentColor" stroke="none" />
+        <path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z" fill="currentColor" stroke="none" />
+      </symbol>
+      <symbol id="i-pen" viewBox="0 0 24 24">
+        <path d="m4 20 4.6-1 9.7-9.7a2.1 2.1 0 0 0-3-3L5.6 16 4 20Z" />
+        <path d="m14.3 6.3 3.4 3.4" />
+      </symbol>
+      <symbol id="i-highlighter" viewBox="0 0 24 24">
+        <path d="m14 4.2 5.8 5.8-7.4 7.4H7.6v-4.8L14 4.2Z" />
+        <path d="M4.5 21h15" />
+      </symbol>
+      <symbol id="i-eraser" viewBox="0 0 24 24">
+        <path d="M9 19.5h11" />
+        <path d="M14.5 5.6 19.9 11a1.8 1.8 0 0 1 0 2.6l-5 5H9.3L4.5 13.8a1.8 1.8 0 0 1 0-2.6l7.4-7.4a1.8 1.8 0 0 1 2.6 0Z" />
+      </symbol>
+      <symbol id="i-undo" viewBox="0 0 24 24">
+        <path d="m9 5-5 5 5 5" /><path d="M4 10h9.5a6.5 6.5 0 0 1 0 13H12" />
+      </symbol>
+      <symbol id="i-redo" viewBox="0 0 24 24">
+        <path d="m15 5 5 5-5 5" /><path d="M20 10h-9.5a6.5 6.5 0 0 0 0 13H12" />
+      </symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24">
+        <path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6.5 7l.8 12a2 2 0 0 0 2 1.9h5.4a2 2 0 0 0 2-1.9l.8-12M10 11v6M14 11v6" />
+      </symbol>
+      <symbol id="i-keyboard" viewBox="0 0 24 24">
+        <rect x="3" y="6.5" width="18" height="11" rx="2.2" />
+        <path d="M7 10h.01M11 10h.01M15 10h.01M18 10h.01M7 13.5h.01M11 13.5h.01M15 13.5h.01M18 13.5h.01M8.5 16.5h7" />
+      </symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24">
+        <path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1" /><path d="M20.5 4.5v5h-5" />
+      </symbol>
+      <symbol id="i-send" viewBox="0 0 24 24">
+        <path d="M12 19V5M6 11l6-6 6 6" />
+      </symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24">
+        <rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor" stroke="none" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" /></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24">
+        <rect x="9" y="9" width="11" height="11" rx="2.2" />
+        <path d="M15 6V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h1" />
+      </symbol>
+      <symbol id="i-download" viewBox="0 0 24 24">
+        <path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M4.5 20h15" />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19.5 7" /></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24">
+        <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z" />
+        <circle cx="12" cy="12" r="2.7" />
+      </symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24">
+        <path d="M4 4.5 20 20.5M10 6.8A11 11 0 0 1 12 6.5c6 0 9.5 5.5 9.5 5.5a17 17 0 0 1-3.2 3.6M6.4 8.4C4 10.1 2.5 12 2.5 12S6 17.5 12 17.5c1.2 0 2.3-.2 3.3-.6" />
+      </symbol>
+      <symbol id="i-bulb" viewBox="0 0 24 24">
+        <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5.9 1.2.9 2V17h5.2v-1.1c0-.8.3-1.5.9-2A6 6 0 0 0 12 3Z" />
+      </symbol>
+      <symbol id="i-chat" viewBox="0 0 24 24">
+        <path d="M20.5 14.5a3.5 3.5 0 0 1-3.5 3.5H8.5L3.5 21V6.5A3.5 3.5 0 0 1 7 3h10a3.5 3.5 0 0 1 3.5 3.5v8Z" />
+      </symbol>
+      <symbol id="i-book" viewBox="0 0 24 24">
+        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15.5H6.5A2.5 2.5 0 0 0 4 21V5.5Z" />
+        <path d="M8 7.5h8M4 18.5A2.5 2.5 0 0 1 6.5 16H20" />
+      </symbol>
+      <symbol id="i-external" viewBox="0 0 24 24">
+        <path d="M14 4h6v6M20 4l-9 9M18.5 14v4.5a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 18.5V7a1.5 1.5 0 0 1 1.5-1.5H10" />
+      </symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24">
+        <path d="M12 3.5 21.5 20H2.5L12 3.5Z" /><path d="M12 9.5v4.5M12 17.5h.01" />
+      </symbol>
+      <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+      <symbol id="i-more" viewBox="0 0 24 24">
+        <circle cx="5" cy="12" r="1.3" fill="currentColor" stroke="none" />
+        <circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none" />
+        <circle cx="19" cy="12" r="1.3" fill="currentColor" stroke="none" />
+      </symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24">
+        <rect x="5" y="10" width="14" height="10" rx="2.2" />
+        <path d="M8 10V7.5a4 4 0 0 1 8 0V10M12 14v2.5" />
+      </symbol>
+    </svg>
+
+    <div class="app" id="app">
+      <header class="topbar">
+        <button class="icon-btn sidebar-toggle" id="sidebarToggle" aria-label="打开笔记列表" title="笔记列表">
+          <svg class="icon"><use href="#i-menu" /></svg>
+        </button>
+        <div class="brand" aria-label="随墨">
+          <span class="brand-mark"><svg class="icon"><use href="#i-logo" /></svg></span>
+          <span class="brand-copy">
+            <span class="brand-name">随墨</span>
+            <span class="brand-sub">SUIMO · AI 笔记</span>
+          </span>
+        </div>
+
+        <div class="title-block">
+          <input id="noteTitle" class="note-title" type="text" maxlength="60" aria-label="笔记标题" placeholder="未命名笔记" />
+          <div class="meta-line">
+            <span id="saveState">已保存</span>
+            <span class="meta-dot" aria-hidden="true"></span>
+            <span id="noteStats">0 字</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="ai-pill" id="aiToggle" type="button" aria-pressed="true" title="开关实时建议">
+            <span class="pulse-dot" aria-hidden="true"></span>
+            <span class="ai-pill-label">实时建议</span>
+          </button>
+          <button class="icon-btn mobile-only ai-drawer-btn" id="aiDrawerBtn" aria-label="打开 AI 助手" title="AI 助手">
+            <svg class="icon"><use href="#i-sparkles" /></svg>
+            <span class="ai-drawer-label">AI</span>
+          </button>
+          <button class="icon-btn" id="themeBtn" aria-label="切换深色模式" title="切换主题">
+            <svg class="icon"><use href="#i-sun" /></svg>
+          </button>
+          <button class="icon-btn" id="settingsBtn" aria-label="打开设置" title="设置">
+            <svg class="icon"><use href="#i-settings" /></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <aside class="sidebar" id="sidebar" aria-label="笔记列表">
+          <div class="sidebar-head">
+            <div>
+              <h2>我的笔记</h2>
+              <p id="noteCount">0 篇</p>
+            </div>
+            <button class="new-note-btn" id="newNoteBtn" type="button">
+              <svg class="icon"><use href="#i-plus" /></svg>
+              <span>新建</span>
+            </button>
+          </div>
+
+          <label class="search-field">
+            <svg class="icon"><use href="#i-search" /></svg>
+            <input id="searchInput" type="search" placeholder="搜索标题或内容" autocomplete="off" />
+          </label>
+
+          <div class="note-list" id="noteList"></div>
+
+          <div class="sidebar-foot">
+            <button class="api-card" id="apiCard" type="button" title="打开 AI 设置">
+              <span class="api-dot" id="apiDot"></span>
+              <span class="api-copy">
+                <span class="api-label" id="apiLabel">本地演示模式</span>
+                <span class="api-sub" id="apiSub">配置 API Key 连接真实模型</span>
+              </span>
+              <svg class="icon api-arrow"><use href="#i-arrow" /></svg>
+            </button>
+            <p class="foot-note">笔记与密钥仅保存在本机浏览器</p>
+          </div>
+        </aside>
+
+        <main class="editor-area" aria-label="笔记编辑区">
+          <div class="editor-toolbar">
+            <div class="mode-switch" role="tablist" aria-label="笔记类型">
+              <button type="button" class="mode-btn" data-mode="ink" role="tab" aria-selected="false">
+                <svg class="icon"><use href="#i-pen" /></svg><span>手写</span>
+              </button>
+              <button type="button" class="mode-btn" data-mode="text" role="tab" aria-selected="true">
+                <svg class="icon"><use href="#i-keyboard" /></svg><span>文字</span>
+              </button>
+            </div>
+            <div class="editor-tools">
+              <span class="editor-stats" id="editorStats">0 字</span>
+              <button class="ghost-btn" id="exportBtn" type="button" title="导出当前笔记">
+                <svg class="icon"><use href="#i-download" /></svg><span>导出</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="paper-wrap">
+            <div class="paper mode-text" id="paper" data-paper="dots">
+              <div class="text-editor" id="textEditor">
+                <textarea
+                  id="noteText"
+                  class="note-text"
+                  spellcheck="false"
+                  aria-label="笔记正文"
+                  placeholder="写下今天的想法…&#10;选中文字或直接在右侧向 AI 提问。"
+                ></textarea>
+              </div>
+
+              <div class="ink-editor" id="inkEditor" hidden>
+                <canvas id="inkBase" aria-hidden="true"></canvas>
+                <canvas id="inkLive" aria-label="手写画布" role="img"></canvas>
+                <div class="ink-empty" id="inkEmpty">
+                  <svg class="icon"><use href="#i-pen" /></svg>
+                  <p>用触控笔或鼠标开始书写</p>
+                  <span>停笔片刻，AI 会读一读你的笔记</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ink-dock" id="inkToolbar" role="toolbar" aria-label="手写工具" hidden>
+              <div class="dock-group" id="toolGroup">
+                <button type="button" class="tool-btn is-active" data-tool="pen" title="钢笔 (P)" aria-label="钢笔" aria-pressed="true">
+                  <svg class="icon"><use href="#i-pen" /></svg>
+                </button>
+                <button type="button" class="tool-btn" data-tool="highlighter" title="荧光笔 (H)" aria-label="荧光笔" aria-pressed="false">
+                  <svg class="icon"><use href="#i-highlighter" /></svg>
+                </button>
+                <button type="button" class="tool-btn" data-tool="eraser" title="橡皮 (E)" aria-label="橡皮" aria-pressed="false">
+                  <svg class="icon"><use href="#i-eraser" /></svg>
+                </button>
+              </div>
+              <span class="dock-divider" aria-hidden="true"></span>
+              <div class="swatches" id="swatches" aria-label="墨色"></div>
+              <span class="dock-divider" aria-hidden="true"></span>
+              <div class="widths" id="widths" aria-label="笔迹粗细"></div>
+              <span class="dock-divider" aria-hidden="true"></span>
+              <div class="dock-group">
+                <button type="button" class="tool-btn" id="undoBtn" title="撤销 (Ctrl+Z)" aria-label="撤销" disabled>
+                  <svg class="icon"><use href="#i-undo" /></svg>
+                </button>
+                <button type="button" class="tool-btn" id="redoBtn" title="重做 (Ctrl+Shift+Z)" aria-label="重做" disabled>
+                  <svg class="icon"><use href="#i-redo" /></svg>
+                </button>
+                <button type="button" class="tool-btn" id="clearInkBtn" title="清空本页" aria-label="清空本页">
+                  <svg class="icon"><use href="#i-trash" /></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <aside class="ai-rail" id="aiRail" aria-label="AI 助手">
+          <div class="ai-head">
+            <div class="ai-title-row">
+              <h2><svg class="icon"><use href="#i-sparkles" /></svg> AI 助手</h2>
+              <button class="icon-btn mobile-only" id="aiRailClose" aria-label="收起 AI 助手">
+                <svg class="icon"><use href="#i-close" /></svg>
+              </button>
+            </div>
+            <p class="ai-subtitle"><span class="status-dot" id="aiStatusDot"></span><span id="aiSubtitle">正在关注你的笔记</span></p>
+          </div>
+
+          <div class="ai-tabs" role="tablist" aria-label="AI 面板">
+            <button type="button" class="ai-tab is-active" data-ai-tab="suggest" role="tab" aria-selected="true">
+              实时建议 <span class="tab-badge" id="suggestCount" hidden>0</span>
+            </button>
+            <button type="button" class="ai-tab" data-ai-tab="chat" role="tab" aria-selected="false">问答</button>
+            <button type="button" class="icon-btn analyze-btn" id="analyzeBtn" title="立即分析当前笔记" aria-label="立即分析当前笔记">
+              <svg class="icon"><use href="#i-refresh" /></svg>
+            </button>
+          </div>
+
+          <section class="ai-panel suggest-panel" id="suggestPanel" aria-label="实时建议">
+            <div class="reading-card" id="readingState" hidden>
+              <svg class="icon"><use href="#i-eye" /></svg>
+              <p><span class="reading-label">AI 读到</span><span id="readingText"></span></p>
+            </div>
+
+            <div class="suggest-loading" id="suggestLoading" hidden aria-label="AI 正在阅读">
+              <div class="loading-row"><span class="typing-dots"><i></i><i></i><i></i></span> AI 正在读这页笔记…</div>
+              <div class="skeleton-card">
+                <span class="skeleton-line w-30"></span>
+                <span class="skeleton-line w-80"></span>
+                <span class="skeleton-line w-60"></span>
+              </div>
+              <div class="skeleton-card">
+                <span class="skeleton-line w-25"></span>
+                <span class="skeleton-line w-70"></span>
+              </div>
+            </div>
+
+            <div class="suggest-error" id="suggestError" hidden>
+              <svg class="icon"><use href="#i-alert" /></svg>
+              <p id="suggestErrorText"></p>
+              <div class="error-actions">
+                <button class="mini-btn" id="suggestRetryBtn" type="button">重试</button>
+                <button class="mini-btn ghost" id="suggestSettingsBtn" type="button">打开设置</button>
+              </div>
+            </div>
+
+            <div class="suggest-list" id="suggestList"></div>
+
+            <div class="suggest-empty" id="suggestEmpty">
+              <div class="empty-art" aria-hidden="true">
+                <span class="empty-sheet"></span>
+                <span class="empty-pen"></span>
+                <span class="empty-spark s1"></span>
+                <span class="empty-spark s2"></span>
+                <span class="empty-spark s3"></span>
+              </div>
+              <h3>AI 会陪你一起写</h3>
+              <p>当你停下笔，我会读一读这页笔记，给出简短的提示、追问或拓展。</p>
+              <button class="mini-btn" id="analyzeEmptyBtn" type="button">分析当前笔记</button>
+            </div>
+
+            <div class="demo-notice" id="demoNotice" hidden>
+              <svg class="icon"><use href="#i-sparkles" /></svg>
+              <p><strong>本地演示</strong> · 无需 API Key</p>
+              <button class="link-btn" id="demoConfigBtn" type="button">连接真实模型</button>
+            </div>
+
+            <p class="rail-foot" id="railFoot">内容仅在生成建议时发送给你配置的 AI 服务。</p>
+          </section>
+
+          <section class="ai-panel chat-panel" id="chatPanel" aria-label="向 AI 提问" hidden>
+            <div class="chat-topline">
+              <span>关于这页笔记</span>
+              <button class="link-btn" id="chatClearBtn" type="button" hidden>清空对话</button>
+            </div>
+            <div class="chat-log" id="chatLog"></div>
+            <div class="chat-empty" id="chatEmpty">
+              <div class="empty-art chat-art" aria-hidden="true">
+                <span class="empty-bubble"></span>
+                <span class="empty-spark s1"></span>
+                <span class="empty-spark s2"></span>
+              </div>
+              <h3>就这页笔记聊聊</h3>
+              <p>让 AI 解释难点、总结要点，或出几道题考考你。</p>
+            </div>
+            <div class="quick-prompts" id="quickPrompts">
+              <button type="button" data-prompt="用三句话总结这页笔记">总结要点</button>
+              <button type="button" data-prompt="根据这页笔记，出三道自测题并给出答案">出题自测</button>
+              <button type="button" data-prompt="这页笔记里有哪些地方可以写得更清楚？">找出盲点</button>
+            </div>
+            <form class="chat-composer" id="chatForm">
+              <textarea id="chatInput" rows="1" placeholder="就这页笔记提问…" aria-label="向 AI 提问"></textarea>
+              <button class="send-btn" id="chatSend" type="submit" aria-label="发送">
+                <svg class="icon"><use href="#i-send" /></svg>
+              </button>
+              <button class="send-btn stop-btn" id="chatStop" type="button" aria-label="停止回答" hidden>
+                <svg class="icon"><use href="#i-stop" /></svg>
+              </button>
+            </form>
+            <p class="chat-hint">Enter 发送 · Shift + Enter 换行</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+
+    <div class="scrim" id="scrim" hidden></div>
+
+    <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+      <form method="dialog" class="settings-shell" id="settingsForm">
+        <header class="settings-head">
+          <div>
+            <h2 id="settingsTitle">设置</h2>
+            <p>连接你自己的模型，随墨只做那支笔。</p>
+          </div>
+          <button class="icon-btn" id="settingsClose" type="button" aria-label="关闭设置">
+            <svg class="icon"><use href="#i-close" /></svg>
+          </button>
+        </header>
+
+        <div class="settings-body">
+          <section class="settings-section">
+            <div class="section-title">
+              <h3>模型与 API</h3>
+              <span class="section-hint">使用你自己的 API Key</span>
+            </div>
+
+            <label class="field">
+              <span class="field-label">服务商</span>
+              <select id="setProvider">
+                <option value="demo">本地演示（无需 Key）</option>
+                <option value="openai">OpenAI</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="moonshot">Moonshot · Kimi</option>
+                <option value="qwen">通义千问</option>
+                <option value="custom">自定义（OpenAI 兼容）</option>
+              </select>
+            </label>
+
+            <div class="field-grid" id="apiFields">
+              <label class="field">
+                <span class="field-label">Base URL</span>
+                <input id="setBaseUrl" type="url" inputmode="url" placeholder="https://api.openai.com/v1" autocomplete="off" spellcheck="false" />
+              </label>
+              <label class="field">
+                <span class="field-label">模型</span>
+                <input id="setModel" type="text" placeholder="gpt-4o-mini" autocomplete="off" spellcheck="false" />
+              </label>
+            </div>
+
+            <label class="field">
+              <span class="field-label">API Key<span class="field-inline" id="keyHint"></span></span>
+              <span class="key-wrap">
+                <input id="setApiKey" type="password" placeholder="sk-…" autocomplete="off" spellcheck="false" />
+                <button class="icon-btn key-eye" id="keyVisibility" type="button" aria-label="显示 API Key">
+                  <svg class="icon"><use href="#i-eye" /></svg>
+                </button>
+              </span>
+            </label>
+            <p class="field-help" id="providerHelp">Key 只保存在本机浏览器 localStorage，并直接发送到上面的 Base URL。</p>
+
+            <label class="switch-row">
+              <span>
+                <strong>手写页面视觉识别</strong>
+                <small>手写模式会把页面截图发送给支持图片输入的模型。</small>
+              </span>
+              <input id="setVision" type="checkbox" class="switch" />
+            </label>
+
+            <div class="test-row">
+              <button class="mini-btn ghost" id="testBtn" type="button">
+                <svg class="icon"><use href="#i-refresh" /></svg> 测试连接
+              </button>
+              <span class="test-result" id="testResult" role="status"></span>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="section-title"><h3>实时建议</h3></div>
+            <label class="switch-row">
+              <span>
+                <strong>停笔后自动分析</strong>
+                <small>关闭后仍可点击右侧的刷新按钮手动分析。</small>
+              </span>
+              <input id="setAutoSuggest" type="checkbox" class="switch" />
+            </label>
+            <div class="field-grid">
+              <label class="field">
+                <span class="field-label">停笔多久后分析</span>
+                <select id="setDelay">
+                  <option value="1500">1.5 秒</option>
+                  <option value="2500">2.5 秒</option>
+                  <option value="4000">4 秒</option>
+                  <option value="7000">7 秒</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">两次分析最短间隔</span>
+                <select id="setCooldown">
+                  <option value="15">15 秒</option>
+                  <option value="30">30 秒</option>
+                  <option value="60">60 秒</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="section-title"><h3>外观</h3></div>
+            <div class="field">
+              <span class="field-label">主题</span>
+              <div class="choice-row" id="themeChoices">
+                <label class="choice"><input type="radio" name="theme" value="light" /><span>浅色</span></label>
+                <label class="choice"><input type="radio" name="theme" value="dark" /><span>深色</span></label>
+                <label class="choice"><input type="radio" name="theme" value="system" /><span>跟随系统</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <span class="field-label">纸张</span>
+              <div class="choice-row" id="paperChoices">
+                <label class="choice"><input type="radio" name="paper" value="dots" /><span>点阵</span></label>
+                <label class="choice"><input type="radio" name="paper" value="lines" /><span>横线</span></label>
+                <label class="choice"><input type="radio" name="paper" value="blank" /><span>空白</span></label>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="section-title"><h3>数据</h3><span class="section-hint">全部保存在本机</span></div>
+            <div class="data-actions">
+              <button class="mini-btn ghost" id="exportAllBtn" type="button">
+                <svg class="icon"><use href="#i-download" /></svg> 导出全部笔记
+              </button>
+              <button class="mini-btn danger" id="clearAllBtn" type="button">
+                <svg class="icon"><use href="#i-trash" /></svg> 清除全部数据
+              </button>
+            </div>
+            <p class="field-help">清除会删除所有笔记、对话与 API Key，且无法恢复。</p>
+          </section>
+        </div>
+
+        <footer class="settings-foot">
+          <button class="mini-btn ghost" id="cancelSettingsBtn" type="button">取消</button>
+          <button class="primary-btn" id="saveSettingsBtn" type="submit">保存设置</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog class="confirm-dialog" id="confirmDialog" aria-labelledby="confirmTitle">
+      <h2 id="confirmTitle">确认操作</h2>
+      <p id="confirmBody"></p>
+      <div class="confirm-actions">
+        <button class="mini-btn ghost" id="confirmCancel" type="button">取消</button>
+        <button class="mini-btn danger" id="confirmOk" type="button">确认</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

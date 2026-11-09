@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="随墨 Suimo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d9683a" />
+      <stop offset="1" stop-color="#a63a14" />
+    </linearGradient>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fffaf1" />
+      <stop offset="1" stop-color="#f7e5d5" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)" />
+  <circle cx="392" cy="116" r="116" fill="#ffffff" opacity=".06" />
+  <path
+    d="M268 118c45 54 80 94 80 138a80 80 0 0 1-160 0c0-44 35-84 80-138Z"
+    fill="url(#drop)"
+  />
+  <path
+    d="M220 280c4 29 26 47 53 49"
+    fill="none"
+    stroke="#c25a30"
+    stroke-linecap="round"
+    stroke-width="15"
+    opacity=".85"
+  />
+  <path
+    d="m387 148 12 32 32 12-32 12-12 32-12-32-32-12 32-12 12-32Z"
+    fill="#fffaf1"
+    opacity=".92"
+  />
+  <path
+    d="m124 108 7 19 19 7-19 7-7 19-7-19-19-7 19-7 7-19Z"
+    fill="#fffaf1"
+    opacity=".55"
+  />
+</svg>
