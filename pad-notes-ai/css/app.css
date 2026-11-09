@@ -2660,8 +2660,20 @@ input.switch:checked::after {
     grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
   }
 
-  .ai-drawer-btn {
-    display: inline-grid;
+  .icon-btn.ai-drawer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    width: auto;
+    padding: 0 10px 0 8px;
+    font-size: 10.5px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+  }
+
+  .ai-drawer-btn .icon {
+    width: 15px;
+    height: 15px;
   }
 
   .ai-rail {
