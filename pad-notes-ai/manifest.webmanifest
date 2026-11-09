@@ -1,0 +1,26 @@
+{
+  "name": "随墨 · 平板笔记 AI 助手",
+  "short_name": "随墨",
+  "description": "边写边想，AI 在旁。为 Android 平板设计的手写笔记与实时 AI 助手。",
+  "lang": "zh-CN",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f2eee6",
+  "theme_color": "#f2eee6",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
