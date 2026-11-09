@@ -110,3 +110,5 @@ pad-notes-android/
 | ![悬浮面板](docs/screenshots/05-android-overlay-panel.png) | ![框选区域](docs/screenshots/06-android-crop.png) | ![悬浮建议](docs/screenshots/07-android-overlay-suggestions.png) |
 
 截图背景里的启动器时钟是模拟器自带的桌面组件；应用本身不包含它。
+
+> 截图由 CI 在 `android-screenshots` 标签触发时生成并回写到本分支。
