@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme tokens ported from pad-notes-ai/css/app.css -->
+    <color name="bg">#141210</color>
+    <color name="bg_soft">#191612</color>
+    <color name="panel">#1B1815</color>
+    <color name="panel_2">#221E19</color>
+    <color name="paper">#211D18</color>
+    <color name="text">#F1EBDF</color>
+    <color name="text_2">#B3AA9B</color>
+    <color name="text_3">#948A7B</color>
+    <color name="line">#17F1EBDF</color>
+    <color name="line_strong">#2BF1EBDF</color>
+    <color name="accent">#EF8A62</color>
+    <color name="accent_hover">#F5A184</color>
+    <color name="accent_soft">#24EF8A62</color>
+    <color name="on_accent">#2C160E</color>
+    <color name="jade">#6CC4A4</color>
+    <color name="jade_soft">#216CC4A4</color>
+    <color name="amber">#D6A851</color>
+    <color name="amber_soft">#21D6A851</color>
+    <color name="blue">#8AB3DC</color>
+    <color name="blue_soft">#218AB3DC</color>
+    <color name="violet">#BF9BDA</color>
+    <color name="violet_soft">#21BF9BDA</color>
+    <color name="danger">#EF817B</color>
+    <color name="danger_soft">#21EF817B</color>
+    <color name="field">#211D18</color>
+    <color name="scrim">#8C000000</color>
+    <color name="logo_stroke">#211D18</color>
+    <color name="transparent">#00000000</color>
+    <color name="nav_bar">#000000</color>
+    <color name="bubble_start">#F0996F</color>
+    <color name="bubble_end">#C25A30</color>
+</resources>
