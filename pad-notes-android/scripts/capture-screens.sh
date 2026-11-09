@@ -30,9 +30,9 @@ tap_xy() {
 tap_text() {
   local text="$1"
   local i
-  for i in $(seq 1 15); do
-    "$ADB" shell uiautomator dump /sdcard/suimo-ui.xml >/dev/null 2>&1 || true
-    "$ADB" pull /sdcard/suimo-ui.xml /tmp/suimo-ui.xml >/dev/null 2>&1 || true
+  for i in $(seq 1 8); do
+    timeout 10 "$ADB" shell uiautomator dump /sdcard/suimo-ui.xml >/dev/null 2>&1 || true
+    timeout 10 "$ADB" pull /sdcard/suimo-ui.xml /tmp/suimo-ui.xml >/dev/null 2>&1 || true
     local coords
     coords=$(python3 - "$text" <<'PY'
 import re
@@ -85,7 +85,7 @@ PY
 }
 
 panel_frame() {
-  "$ADB" shell dumpsys window windows 2>/dev/null | python3 -c '
+  timeout 20 "$ADB" shell dumpsys window windows 2>/dev/null | python3 -c '
 import re, sys
 text = sys.stdin.read()
 candidates = []
@@ -144,6 +144,8 @@ start_overlay() {
 
 "$ADB" start-server >/dev/null 2>&1 || true
 "$ADB" wait-for-device
+"$ADB" shell input keyevent 224 >/dev/null 2>&1 || true
+"$ADB" shell wm dismiss-keyguard >/dev/null 2>&1 || true
 screen_metrics
 
 "$ADB" shell settings put global window_animation_scale 0 || true
