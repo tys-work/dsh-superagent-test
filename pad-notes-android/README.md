@@ -89,7 +89,7 @@ pad-notes-android/
 
 ## 验证
 
-- `./gradlew :app:testDebugUnitTest`：提示词契约、建议 JSON 容错、服务商端点、裁剪坐标映射。
+- `./gradlew :app:testDebugUnitTest`：20 个 JVM 单测，覆盖提示词契约、建议 JSON 容错、服务商端点、裁剪坐标映射，以及演示建议的 8 秒节流 / pattern 轮换。
 - `./gradlew :app:lintDebug :app:assembleDebug`：Android Lint 与 Debug APK 构建。
 - GitHub Actions 的 `pad-notes-android` 工作流在 API 34 模拟器上安装 APK、授予悬浮窗权限、启动屏幕共享，并截取设置页、悬浮面板、建议卡片和框选界面。
 
